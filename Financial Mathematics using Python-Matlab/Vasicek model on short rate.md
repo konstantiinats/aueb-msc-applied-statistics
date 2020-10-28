@@ -7,13 +7,12 @@
 
 ### Implementation of the Vasicek model on short rate. The dataset used is the three-month EURIBOR from 02/07/2001 - 04/24/2006. 
 ### The aformentioned model had been used in five different cases in order to predict the EURIBOR rate return for the next 70 days.
-
-####Language: Matlab
-
+###Language: Matlab
 
 
 
-####Data Loading
+
+Data Loading
 ```
 load Data_GlobalIdx2;
 plot(dates, 100 * Dataset.EB3M)
@@ -21,7 +20,7 @@ datetick('x'), xlabel('Date'), ylabel('Daily Yield (%)')
 title('3-Month Euribor as a Daily Effective Yield')
 ```
  
-####Model fitting to data
+Model fitting to data
 ```
 yields     = Dataset.EB3M;
 regressors = [ones(length(yields) - 1, 1) yields(1:end-1)];
@@ -33,12 +32,12 @@ level = -coefficients(1)/coefficients(2);
 sigma =  std(residuals)/sqrt(dt);
  ```
  
-####Create an object and identify Start State (the most recent short rate)
+Create an object and identify Start State (the most recent short rate)
 ```
 obj = hwv(speed, level, sigma, 'StartState', yields(end))
  ```
  
-####Model simulation
+Model simulation
 ```
 T      = 64;
 times  = (1:T)';
@@ -61,21 +60,21 @@ for k = 1:log2(T)
 end
 ```
 
-####Interpolation times plot
+Interpolation times plot
 ```
 stem(1:length(t), t, 'filled')
 xlabel('Index'), ylabel('Interpolation Time (Days)')
 title ('Sampling Scheme for the Power-of-Two Algorithm')
 ```
 
-####Time series grid initialization
+Time series grid initialization
 ```
 average = obj.StartState * exp(-speed * T) + level * ...
 (1 - exp(-speed * T));
 X       = [obj.StartState ; average];
 ```
 
-####Sample paths generation
+Sample paths generation
 ```
 nTrials = 5;
 rng(63349,'twister')
@@ -83,7 +82,7 @@ Y = obj.interpolate(t, X(:,:,ones(nTrials,1)), ...
 'Times',[obj.StartTime  T], 'Refine', true);
 ```
 
-####Sample paths plot
+Sample paths plot
 ```
 [t,i] = sort(t);
 Y     = squeeze(Y);
