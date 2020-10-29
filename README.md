@@ -1,5 +1,5 @@
 # AUEB M.Sc. in Applied Statistics (part-time)
-A repo of some indicative assignments for the AUEB M.Sc. in Applied Statistics (2018-2020)
+My repo of some indicative assignments for the AUEB M.Sc. in Applied Statistics (2018-2020)
 
 ----------
 
