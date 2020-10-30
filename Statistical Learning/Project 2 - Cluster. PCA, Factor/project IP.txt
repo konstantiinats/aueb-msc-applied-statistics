@@ -1,0 +1,206 @@
+The data set includes 63 sample points of bird species and variables (columns) of 48 habitat (environment) variables.  
+More analytically, 
+the first column is the name of bird species, next the 48 habitat variables measured at 164 sample points of a valley. These are 
+organized into three logical groups: geomorphology (14 variables), landscape composition (20 variables) and landscape heterogeneity (14 variables).
+The last column (NOBLOCKS) is the total number of detections of each bird at a series of visits at certain selected transects 
+of the valey (same transects where the measurements of the 48 habitat measurements have been taken). For the working dataset 
+exclude all cpecies (rows) that have been detected less that 4 times.
+The measurements of environmental variables are the mean habitat conditions for each bird cpecies.
+
+The aim of the project is to use cluster analysis to find groups of bird species that have
+similar habitat associations on the basis of the variables provided. 
+
+1. Use hierarchical and k means method to identify the group of species.  Assess the number of clusters
+   and describe the group differences with respect to environmental conditions.
+2. Instead of the original variables use principal components for the each group of environmental variables 
+   (geomorphology, landscape composition and landscape heterogeneity).
+3. Repeat step 1 for the PCs collected from the thee types of variables and add model based method for clustering.
+4. Use factor analysis in a similar manner to step 2 and provide the factor or factors for each of the three invironmental variables. 
+5. Provide plots (boxplots, scatter plots) on PCA and FA (Factor Analysis) scores to visulasize and describe similarities or differences 
+   within and between bird species groups with respect to environmental conditions.
+
+You have to submit the project by 7th of June via email.
+
+Appendix. 
+
+Bird Species Variables (Acronyms)
+-----------------------------
+Great Blue Heron=GBHE
+Wood Duck=WODU
+Mallard=MALL
+Hooded Merganser=HOME
+Common Merganser=COME
+Turkey Vulture=TUVU
+Goshawk=GOSH
+Cooper's Hawk=COHA
+Sharp-Shinned Hawk=SSHA
+Red-Tailed Hawk=RTHA
+Bald Eagle=BAEA
+Osprey=OSPR
+American Kestrel=AMKE
+Great Horned Owl=GHOW
+Spotted Owl=SPOW
+Screech Owl=SCOW
+Saw-whet Owl=SWOW
+Pygmy Owl=PYOW
+Blue Grouse=BUGR
+Ruffed Grouse=RUGR
+California Quail=CAQU
+Mountain Quail=MOQU
+Marbled Murrelet=MAMU
+Common Snipe=COSN
+Band-tailed Pigeon=BTPI
+Mourning Dove=MODO
+Common Nighthawk=CONI
+Vaux's Swift=VASW
+Rufous Humingbird=RUHU
+Belted Kingfisher=BEKI
+Northern Flicker=NOFL
+Pileated Woodpecker=PIWO
+Red-br Sapsucker=RBSA
+Hairy Woodpecker=HAWO
+Downy Woodpecker=DOWO
+Willow Flycatcher=WIFL
+Hammond's Flycatcher=HAFL
+Western Flycatcher=WEFL
+Western Wood Pewee=WWPE
+Olive-sd Flycatcher=OSFL
+Violet-green Swallow=VGSW
+Tree Swallow=TRSW
+Bank Swallow=BKSW
+Rough-winged Swallow=RWSW
+Barn Swallow=BASW
+Gray Jay=GRJA
+Steller's Jay=STJA
+Scrub Jay=SCJA
+Common Raven=CORA
+Common Crow=COCR
+Black-cap Chickadee=BCCH
+Chestnut-bk Chickadee=CBCH
+Bushtit=BUSH
+White-br Nuthatch=WBNU
+Red-br Nuthatch=RBNU
+Brown Creeper=BRCR
+Wrentit=WREN
+Dipper=DIPP
+House Wren=HOWR
+Winter Wren=WIWR
+Bewick's Wren=BEWR
+Marsh Wren=MAWR
+American Robin=AMRO
+Varied Thrush=VATH
+Hermit Thrush=HETH
+Swaison's Thrush=SWTH
+Western Bluebird=WEBL
+Townsend's Solitaire=TOSO
+Golden-cr Kinglet=GCKI
+Ruby-cr Kinglet=RCKI
+Cedar Waxwing=CEWA
+Warbling Vireo=WAVI
+Hutton's Vireo=HUVI
+Solitary Vireo=SOVI
+O-crowned Warbler=OCWA
+Nashville Warbler=NAWA
+Cluster Analysis 22
+Yellow Warbler=YEWA
+Y-rumped Warbler=YRWA
+Black-throated Gray=BGWA
+Townsend's Warbler=TOWA
+Hermit Warbler=HEWA
+MacGill. Warbler=MGWA
+Common Yellowthroat=COYE
+Wilson's Warbler=WIWA
+Western Meadowlark=WEME
+Red-winged Blackbird=RWBL
+Brewer's Blackbird=BRBL
+Brown-headed Cowbird=BHCO
+Western Tanager=WETA
+Black-headed Grosbeak=BHGR
+Evening Grosbeak=EVGR
+Purple Finch=PUFI
+House Finch=HOFI
+Pine Siskin=PISI
+American Goldfinch=AMGO
+Lesser Goldfinch=LEGO
+Red Crossbill=RECR
+Rufous-sided Towhee=RSTO
+Dark-eyed Junco=DEJU
+Chipping Sparrow=CHSP
+White-cr Sparrow=WCSP
+Golden-cr Sparrow=GCSP
+Fox Sparrow=FOSP
+Song Sparrow=SOSP
+Valley Geomorphology Variables
+Variable Description
+____________________________________________________________________________
+VAREA Valley floor area (ha)
+FAREA Floodplain area (ha)
+SAREA Stream area (ha)
+DAREA Drainage area (ha)
+MVWIDTH Mean valley floor width (m), measured at 10 m intervals.
+MFWIDTH Mean flood plain width (m), measured at 10 m intervals.
+MSWIDTH Mean stream width (m), measured at 10 m intervals.
+MVCON Mean valley floor constraint index (no units), measured at 10 m intervals, (constraint
+= stream width/valley floor width).
+MFCON Mean floodplain constraint index (no units), measured at 10 m intervals, (constraint
+= stream width/flood plain width).
+CVWIDTH Coefficient of variation (sd/mean) in valley floor width (%) [n=10 measurements at
+10 m intervals].
+CFWIDTH Coefficient of variation (sd/mean) in flood plain width (%) [n=10 measurements at
+Cluster Analysis 23
+10 m intervals].
+CSWIDTH Coefficient of variation (sd/mean) in stream width (%) [n=10 measurements at 10 m
+intervals].
+CVCON Coefficient of variation (sd/mean) in valley floor constraint index (%) [n=10
+measurements at 10 m intervals].
+CFCON Coefficient of variation (sd/mean) in flood plain constraint index (%) [n=10
+measurements at 10 m intervals].
+____________________________________________________________________________
+Variable Description
+________________________________________________________________________
+Nonforested Patch Types
+G Grassland (non-forest; e.g., meadows)
+B Brush (no trees; permanant brush field)
+HW Herbaceous wetland
+HSW Hardwood shruby wetland
+Forested Patch Types
+HSH Hardwood plant community, shrub stand condition
+HCS Hardwood plant community, closed sampling stand condition
+HOP Hardwood plant community, open pole stand condition
+HCP Hardwood plant community, closed pole stand condition
+HSS Hardwood plant community, small sawtimber stand condition
+HLS Hardwood plant community, large sawtimber stand condition
+COP Conifer plant community, open pole stand condition
+CCP Conifer plant community, closed pole stand condition
+CLS Conifer plant community, large sawtimber stand condition
+MGF Grass-forb stage of forest succession (following clearcut)
+MSH Mixed hardwood-conifer plant community, shrub stand condition
+MOS Mixed hardwood-conifer plant community, open sapling stand condition
+MCS Mixed hardwood-conifer plant community, closed sampling stand condition
+MOP Mixed hardwood-conifer plant community, open pole stand condition
+MCP Mixed hardwood-conifer plant community, closed pole stand condition
+MLS Mixed hardwood-conifer plant community, large sawtimber stand condition
+________________________________________________________________________
+Cluster Analysis 24
+Landscape Heterogeneity Variables
+Variable Description
+____________________________________________________________________________
+NPATCH Number of patches.
+MPSIZE Mean patch size (m).
+MPSHAPE Mean patch shape index (1=circle, >1=more complex geometric shape).
+MPFRAC Mean patch fractal dimension (1=circle, >1=more complex geometric shape).
+CPSIZE Coefficient of variation in patch size (%).
+TEDGE Total linear distance of patch edge (m).
+LFRAC Landscape fractal index (0=landscape contains no edges; >1 landscape contains
+more than one patch).
+PRICH Patch richness; number of different patch types present.
+SHANNON Shannon diversity index, based on the richness of patch types and their relative
+abundance.
+SIMPSON Simpson diversity index, based on the richness of patch types and their relative
+abundance.
+SHEVEN Shannon evenness index, based on the equitability of relative patch abundances.
+SIEVEN Simpson evenness index, based on the equitability of relative patch abundances.
+AMPSHAPE Area-weighted mean patch shape index; mean patch shape index as above, but
+weighted by patch size.
+CONEDGE Contrast-weighted total edge; total linear distance of patch edge (m), but weighted by
+the degree of contrast betwen adjacent patch types.
