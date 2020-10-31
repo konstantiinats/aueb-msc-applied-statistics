@@ -4,4 +4,4 @@
 ## Lecturer: I. Ntzoufras
 ## Author: Konstantina Tsami
 
-## Language: WinBugs, R
+## Languages: WinBugs, R
