@@ -1,0 +1,29 @@
+model{
+
+    # model's likelihood
+    for (i in 1:n){
+				mu[i] <- m + beta[ X[i,2] ]                        #anova 2                                      #m0
+				spen_yr[i] ~ dnorm( mu[i], tau )
+		}
+		
+
+
+
+		#### CR Constraints
+		beta[1] <- 0.0
+
+
+		# priors 
+		m~dnorm( 0.0, 1.0E-04)
+		for (k in 2:LB){
+			beta[k]~dnorm(0.0, 1.0E-04)
+		}
+
+		tau ~dgamma( 0.01, 0.01)
+		s <- sqrt(1/tau) # precission 
+		
+		for (b in 2:LB){
+			p.beta[b] <- step(beta[b])
+		}
+
+}

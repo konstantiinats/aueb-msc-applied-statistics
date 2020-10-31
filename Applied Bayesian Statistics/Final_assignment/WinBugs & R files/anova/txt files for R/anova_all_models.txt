@@ -1,0 +1,48 @@
+model{
+
+    # model's likelihood
+    for (i in 1:n){
+				mu[i] <- m + alpha[ X[i,1] +1 ] + beta[ X[i,2] ] 
+                                + ab[ X[i,2], X[i,1]+1 ]    #interaction term
+				#mu[i] <- m + alpha[ X[i,1] +1 ] + beta[ X[i,2] ]   #main effects
+				#mu[i] <- m + alpha[ X[i,1] +1 ]                    #anova 1
+				#mu[i] <- m + beta[ X[i,2] ]                        #anova 2
+				#mu[i] <- m                                         #m0
+				spen_yr[i] ~ dnorm( mu[i], tau )
+		}
+		
+
+
+
+		#### CR Constraints
+		alpha[1] <- 0.0
+		beta[1] <- 0.0
+		ab[1,1] <- 0.0
+		ab[1,2] <- 0.0
+		for (k in 2:LB){
+		ab[k,1] <- 0.0
+		}
+		
+
+		# priors 
+		m~dnorm( 0.0, 1.0E-04)
+		alpha[2]~dnorm(0.0, 1.0E-04)
+		for (k in 2:LB){
+			beta[k]~dnorm(0.0, 1.0E-04)
+		}
+		for (a in 2:LA){
+		    for (b in 2:LB){
+		         ab[b,a]~dnorm( 0.0, 1.0E-04)
+		}}
+		tau ~dgamma( 0.01, 0.01)
+		s <- sqrt(1/tau) # precission 
+		for (a in 1:LA){
+			p.alpha[a] <- step(alpha[a])
+		}
+		for (b in 2:LB){
+			p.beta[b] <- step(beta[b])
+		}
+		for (a in 2:LA){ for (b in 2:LB) {
+			p.ab[b,a] <- step(ab[b,a])
+		}}
+}

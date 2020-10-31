@@ -1,0 +1,117 @@
+
+model{
+
+	# Dummies#
+	#stz parametrization
+	# Dummies for car , sex with 2 levels
+	for ( i  in 1 : n ){
+		 Dcar [ i ] <- equals( car [ i ] ,  1  )- equals( car [ i ] , 0  )
+		 Dsex [ i ] <- equals( sex [ i ] , 1  )- equals( sex [ i ] , 0  )
+	}
+	
+	# Dummies for distance with 4 levels
+	for ( i  in 1 : n ){ for ( j  in 1 : 4 ){
+		 Ddistance [ i , j ] <- equals( distance [ i ] , j )- equals( distance [ i ] , 1  )
+	}}
+	
+	# Dummies for prices, Qfresh, Qpack, Queues with 5 levels
+	for ( i  in 1 : n ){ for ( j  in 1 : 5 ){
+		DQfresh [ i , j ]  <- equals( Qfresh [ i ] , j )- equals( Qfresh [ i ] , 1  )
+		DQpack [ i , j ]  <- equals( Qpack [ i ] , j )- equals( Qpack [ i ] , 1  )
+		DQueues [ i , j ]  <- equals( Queues [ i ] , j )- equals( Queues [ i ] , 1  )
+		Dprices [ i , j ]  <- equals( prices [ i ] , j )- equals( prices [ i ] , 1  )
+	}}	
+		
+	# Dummies for shop with 10 levels
+	for ( i  in 1 : n ){ for ( j  in 1 : 10 ){
+		 Dshop [ i , j ]  <- equals( shop [ i ] , j )- equals( shop [ i ] , 1  )
+	}}	
+	
+	
+	#
+	
+	for ( i  in 1 : n ){
+		# model's likelihood
+		mu [ i ] <- m + alpha1 [ 2 ] * Dcar [ i ] 
+							 + alpha2 [ 2 ] * Dsex [ i ] 
+		                     + inprod(alpha3 [ 2 : 4 ] , Ddistance [ i , 2 : 4 ] )
+							 + inprod(alpha4 [ 2 : 5 ] , DQfresh [ i , 2 : 5 ] )
+						 	+ inprod(alpha5 [ 2 : 5 ] , DQpack [ i , 2 : 5 ] )
+						     + inprod(alpha6 [ 2 : 5 ] , DQueues [ i , 2 : 5 ] )
+						     + inprod(alpha7 [ 2 : 5 ] , Dprices [ i , 2 : 5 ] )
+						     + inprod(alpha8 [ 2 : 10 ] , Dshop [ i , 2 : 10 ] )
+	                         
+						
+		spen_yr [ i ] ~ dnorm(mu [ i ] , tau )
+		#
+		# NAs estimation
+		# model for Xs	
+		car [ i ] ~ dbern(p1[i]  )
+		logit(p1[i] )<- mc + b[1]*Ddistance[i,2] + b[1]*Ddistance[i,3] + b[1]*Ddistance[i,4]  
+		sex [ i ] ~ dbern (p2  )
+		#		
+		distance [ i ] ~ dcat( pd[1:4 ] ) 
+		prices [ i ] ~ dcat( pp[1:5] ) 
+		Qfresh [ i ] ~ dcat( pQf[1:5] ) 
+		Qpack [ i ] ~ dcat( pQp[1:5] ) 
+		Queues [ i ] ~ dcat( pQu[1:5] ) 
+		#
+		shop [ i ] ~ dcat(ps[1:10])
+			
+	}
+		
+	
+	###  stz constraints
+	alpha1  [ 1 ] <- - alpha1 [ 2 ] 	
+	alpha2  [ 1 ] <- - alpha2 [ 2 ] 
+	alpha3  [ 1 ] <- - sum( alpha3 [ 2 : 4 ]  )
+	alpha4  [ 1 ] <- - sum( alpha4 [ 2 : 5 ]  )
+	alpha5  [ 1 ] <- - sum( alpha5 [ 2 : 5 ]  )
+	alpha6  [ 1 ] <- - sum( alpha6 [ 2 : 5 ]  )
+	alpha7  [ 1 ] <- - sum( alpha7 [ 2 : 5 ]  )
+	alpha8  [ 1 ] <- - sum( alpha8 [ 2 : 10 ]  )
+
+	# priors
+	#model priors
+	m ~ dnorm ( 0.0 , 1.0E-04 )
+	alpha1 [ 2 ]  ~ dnorm( 0.0 , 1.0E-04 )
+	alpha2 [ 2 ]  ~ dnorm( 0.0 , 1.0E-04 )
+	for ( i in 2 : 4 ){ alpha3 [ i ] ~ dnorm(0.0 , 1.0E-04 ) }
+	for ( i in 2 : 5 ){ alpha4 [ i ] ~ dnorm(0.0 , 1.0E-04 )
+	                                  alpha5 [ i ] ~ dnorm(0.0 , 1.0E-04 )
+                                      alpha6 [ i ] ~ dnorm(0.0 , 1.0E-04 )
+	                                  alpha7 [ i ] ~ dnorm(0.0 , 1.0E-04 ) }
+	for ( i in 2 : 10 ){ alpha8 [ i ] ~ dnorm(0.0 , 1.0E-04 )}
+	tau ~ dgamma (0.01 , 0.01 )
+	s <- sqrt( 1/tau )
+	#for model Xs
+	mc~dnorm(0,0.001)
+	for(i in 1:3){ b[i]~dnorm(0,0.001)}
+	p2~dbeta(1,1)
+	#
+	#
+	for (k in 1:10){a[k]<-1 }
+	pd[1:4]~ddirch(a[ 1:4 ])
+	pQf[1:5]~ddirch(a[ 1:5 ])
+	pQp[1:5]~ddirch(a[ 1:5 ])
+	pp[1:5]~ddirch(a[ 1:5 ])
+	pQu[1:5]~ddirch(a[ 1:5 ])
+    ps[1:10]~ddirch(a[ ] )
+
+    #pseudo-R
+    sy2 <- pow(sd(spen_yr[ ] ),2)
+    s2 <- 1/tau
+    R2B <- 1 - s2/sy2
+
+	#p0
+	p.alpha1[2 ] <- step(alpha1[2] )
+	p.alpha2[2 ] <- step(alpha2[2] )
+	for (k in 1:4 ){p.alpha3[k] <- step(alpha3[k])}
+	for (k in 1:5 ){p.alpha4[k] <- step(alpha4[k])
+								  p.alpha5[k] <- step(alpha5[k])
+					   		   p.alpha6[k] <- step(alpha6[k])
+				  		    	p.alpha7[k] <- step(alpha7[k])}
+	for (k in 1:10 ){p.alpha8[k] <- step(alpha8[k])}
+
+}
+

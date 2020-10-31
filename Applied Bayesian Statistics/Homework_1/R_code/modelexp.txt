@@ -1,0 +1,10 @@
+model{
+	# Likelihood
+	for (i in 1:n){ 
+		Y[i] ~ dexp(theta)
+	}
+	#prior
+	log(theta)<-v
+	v ~ dnorm(0.0,0.001) #v=log(theta)
+	c<-1/theta
+}

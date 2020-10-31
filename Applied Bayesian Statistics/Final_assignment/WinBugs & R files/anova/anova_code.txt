@@ -1,0 +1,362 @@
+
+library(R2WinBUGS)
+library(BRugs)
+
+library(foreign)
+sm<-read.spss("C://R//14_supermarkets.sav",use.value.label=TRUE,to.data.frame=TRUE)
+
+sm$sex<-as.numeric(sm$sex)
+sm$sex[sm$sex==1]<-0
+sm$sex[sm$sex==2]<-1
+
+#Import data - sample size
+sm.na<-na.omit(cbind(sm$spen_yr,sm$sex,sm$prices))
+data <-list( spen_yr=sm.na[,1], X=cbind(sm.na[,2],sm.na[,3]), LA=2, LB=5, n=572 )
+rm(sm.na)
+
+# initial values
+# should be a list with one list for each chain
+#
+inits1<-list(  
+	        list( m=1.0, alpha=c(NA,0), tau=1.0, beta=c(NA,0,0,0,0),   			
+                    ab=matrix(c(NA,NA, NA, 0, NA, 0, NA, 0, NA, 0), 5, 2, byrow=TRUE )))
+
+# defining the names of the parameters we wish to monitor
+parameter.names <- c( 's', 'tau' , 'alpha', 'beta' , 'ab' , 'm' , 'p.alpha' , 'p.beta' 
+                         , 'p.ab' )
+
+
+# defining the directory of OpenBUGS
+openbugs.dir <- "C:/Program Files (x86)/OpenBUGS"
+
+# generating random samples using OpenBUGS
+model.ab.intr <- bugs( data, inits1, model.file = "anova_all_models.txt",
+                    parameters = parameter.names,n.chains = 1, 
+			  n.iter = 2000, n.burnin=1000, n.thin=1,  
+			  bugs.directory = openbugs.dir, debug=F, program="OpenBUGS")
+
+
+
+# function for checking the centrality of zero
+# 2013 April by Ioannis Ntzoufras
+# 
+p0 <- function( bugs.object, digits=3){ 
+	mcmc.output<-bugs.object$sims.matrix 
+	n.iter <- nrow(mcmc.output)
+	n.par  <- ncol(mcmc.output)
+	mcmc.output<-mcmc.output[ , -n.par]     #vgazei to Deviance
+	temp<-apply( mcmc.output < 0, 2, mean)
+	res <- pmin( temp, 1-temp)  #min gia kathe stoixeio (temp,1-temp) 
+	return( round(res,digits) )
+}
+
+
+# calculating the probability of zero to be central in the posterior densities
+p0(model.ab.intr)
+
+
+
+# --------------------------------
+# Plots without functions
+# -------------------------------- 
+
+#trace plot
+head(model.ab.intr$sims.matrix)
+
+# Trace plots of  "m", "tau", "alpha"
+x<-match(c("m","tau","alpha[2]"),colnames(model.ab.intr$sims.matrix))
+par(mfrow=c(3,1))
+for (i in x){
+plot(model.ab.intr$sims.matrix[,i],type='l',
+	main=paste("Trace plot of ",colnames(model.ab.intr$sims.matrix)[i]),
+		,xlab="iterations",ylab=paste(colnames(model.ab.intr$sims.matrix)[i]))
+}
+
+# Trace plots of  "beta"
+par(mfrow=c(4,1))
+for (i in 4:7){
+plot(model.ab.intr$sims.matrix[,i],type='l',
+	main=paste("Trace plot of ",colnames(model.ab.intr$sims.matrix)[i]),
+		,xlab="iterations",ylab=paste(colnames(model.ab.intr$sims.matrix)[i]))
+}
+
+# Trace plots of  "ab"
+par(mfrow=c(4,1))
+for (i in 8:11){
+plot(model.ab.intr$sims.matrix[,i],type='l',
+	main=paste("Trace plot of ",colnames(model.ab.intr$sims.matrix)[i]),
+		,xlab="iterations",ylab=paste(colnames(model.ab.intr$sims.matrix)[i]))
+}
+
+
+
+#acf plots
+
+# Autocorrelation of "m", "tau", "alpha"
+x<-match(c("m","tau","alpha[2]"),colnames(model.ab.intr$sims.matrix))
+par(mfrow=c(3,1))
+for (i in x){
+acf(model.ab.intr$sims.matrix[,i],main=paste("ACF plot of ",
+              colnames(model.ab.intr$sims.matrix)[i] ),lag=100)
+}
+
+# Autocorrelation of "beta"
+par(mfrow=c(4,1))
+for (i in 4:7){
+acf(model.ab.intr$sims.matrix[,i],main=paste("ACF plot of ",
+              colnames(model.ab.intr$sims.matrix)[i] ),lag=100)
+}
+
+# Autocorrelation of "ab"
+par(mfrow=c(4,1))
+for (i in 8:11){
+acf(model.ab.intr$sims.matrix[,i],main=paste("ACF plot of ",
+              colnames(model.ab.intr$sims.matrix)[i] ),lag=100)
+}
+
+
+# --------------------------------
+# Summarizing
+# -------------------------------- 
+
+#stats 
+
+
+
+X<-matrix(0,8,12)
+
+for ( j in 1:12){
+X[,j]<-rbind(c(summary(model.ab.intr$sims.matrix[,j]),
+             quantile(model.ab.intr$sims.matrix[,j],probs=0.25),
+		 quantile(model.ab.intr$sims.matrix[,j],probs=0.95)))
+}
+X<-round(X,2)
+x<-summary(model.ab.intr$sims.matrix[,1])
+q1<-quantile(model.ab.intr$sims.matrix[,1],probs=0.25)
+q2<-quantile(model.ab.intr$sims.matrix[,1],probs=0.95)
+rownames(X)<-c(names(x),names(q1),names(q2))
+colnames(X)<-colnames(model.ab.intr$sims.matrix)[1:12]
+X
+
+rm(q1,q2,x)
+
+
+
+#density plots
+
+# density plots of  "m", "tau", "alpha"
+x<-match(c("m","tau","alpha[2]"),colnames(model.ab.intr$sims.matrix))
+par(mfrow=c(2,2))
+for (i in x){
+plot(density(model.ab.intr$sims.matrix[,i]),
+	       main=paste(colnames(model.ab.intr$sims.matrix)[i]))
+}
+
+# density plots of  "beta"
+par(mfrow=c(2,2))
+for (i in 4:7){
+plot(density(model.ab.intr$sims.matrix[,i]),
+	       main=paste(colnames(model.ab.intr$sims.matrix)[i]))
+}
+
+# density plots of  "ab"
+par(mfrow=c(2,2))
+for (i in 8:11){
+plot(density(model.ab.intr$sims.matrix[,i]),
+	       main=paste(colnames(model.ab.intr$sims.matrix)[i]))
+}
+
+
+
+
+# --------------------------------
+# Ergotic mean plots
+# -------------------------------- 
+
+par(mfrow=c(3,1))
+
+# Ergodic Trace plot of  "theta"
+x<-model1.exp$sims.matrix[,"theta"]
+plot( cumsum(x)/1:length(x), type='l',xlab="iterations",
+		ylab=colnames(model1.exp$sims.matrix)[1] )
+
+# Ergodic Trace plots of  "m", "tau", "alpha"
+x<-match(c("m","tau","alpha[2]"),colnames(model.ab.intr$sims.matrix))
+par(mfrow=c(3,1))
+for (i in x){
+x1<-model.ab.intr$sims.matrix[,i]
+plot( cumsum(x1)/1:length(x1), type='l',xlab="iterations",
+		ylab=paste(colnames(model.ab.intr$sims.matrix)[i] ))
+}
+
+# Ergodic Trace plots of  "beta"
+par(mfrow=c(4,1))
+for (i in 4:7){
+x1<-model.ab.intr$sims.matrix[,i]
+plot( cumsum(x1)/1:length(x1), type='l',xlab="iterations",
+		ylab=paste(colnames(model.ab.intr$sims.matrix)[i] ))
+}
+
+# Ergodic Trace plots of  "ab"
+par(mfrow=c(4,1))
+for (i in 8:11){
+x1<-model.ab.intr$sims.matrix[,i]
+plot( cumsum(x1)/1:length(x1), type='l',xlab="iterations",
+		ylab=paste(colnames(model.ab.intr$sims.matrix)[i] ))
+}
+
+
+
+# ------------------------------------
+# Ergotic mean plots using CODA output
+# ------------------------------------ 
+
+modelanova.int<-read.coda("output.odcCODAchain1", "output.odcCODAindex", quiet=FALSE) 	
+
+head(modellnorm.sim)
+
+par(mfrow=c(3,2))
+for (i in 1:5){
+x<-modelanova.int[,i]
+plot( cumsum(x)/1:length(x), type='l',xlab="iterations",
+		ylab=paste(colnames(modelanova.int)[i] ))
+}
+
+
+par(mfrow=c(3,2))
+for (i in 6:10){
+x<-modelanova.int[,i]
+plot( cumsum(x)/1:length(x), type='l',xlab="iterations",
+		ylab=paste(colnames(modelanova.int)[i] ))
+}
+
+
+
+
+# --------------------------------
+# BOA convergence diagnostic tests
+# -------------------------------- 
+
+library(coda)
+codamenu()
+1
+C:/BOA/anova_all_modells.ind.txt
+C:/BOA/anova_all_modells.out.txt
+
+
+
+
+# --------------------------------
+# compare models using DIC
+# -------------------------------- 
+
+##########anova a############
+
+# initial values
+# should be a list with one list for each chain
+#
+inits1<-list(  
+	        list( m=1.0, alpha=c(NA,0), tau=1.0 ))
+
+# defining the names of the parameters we wish to monitor
+parameter.names <- c( 's', 'tau' , 'alpha', 'm' , 'p.alpha' )
+
+
+# defining the directory of OpenBUGS
+openbugs.dir <- "C:/Program Files (x86)/OpenBUGS"
+
+# generating random samples using OpenBUGS
+model.a<- bugs( data, inits1, model.file = "anova_a.txt",
+                    parameters = parameter.names,n.chains = 1, 
+			  n.iter = 2000, n.burnin=1000, n.thin=1,  
+			  bugs.directory = openbugs.dir, debug=F, program="OpenBUGS")
+
+
+
+##########anova b############
+
+
+# initial values
+# should be a list with one list for each chain
+#
+inits1<-list(  
+	        list( m=1.0, tau=1.0, beta=c(NA,0,0,0,0) ))
+
+# defining the names of the parameters we wish to monitor
+parameter.names <- c( 's', 'tau' , 'beta' , 'm' , 'p.beta' )
+
+
+# defining the directory of OpenBUGS
+openbugs.dir <- "C:/Program Files (x86)/OpenBUGS"
+
+# generating random samples using OpenBUGS
+model.b<- bugs( data, inits1, model.file = "anova_b.txt",
+                    parameters = parameter.names,n.chains = 1, 
+			  n.iter = 2000, n.burnin=1000, n.thin=1,  
+			  bugs.directory = openbugs.dir, debug=F, program="OpenBUGS")
+
+
+
+
+##########anova ab###########
+
+
+# initial values
+# should be a list with one list for each chain
+inits1<-list(  
+	        list( m=1.0, alpha=c(NA,0), tau=1.0, beta=c(NA,0,0,0,0) ))
+
+# defining the names of the parameters we wish to monitor
+parameter.names <- c( 's', 'tau' , 'alpha', 'beta' , 'm' , 'p.alpha' , 'p.beta'  )
+
+
+# defining the directory of OpenBUGS
+openbugs.dir <- "C:/Program Files (x86)/OpenBUGS"
+
+# generating random samples using OpenBUGS
+model.a.b<- bugs( data, inits1, model.file = "anova_a_b.txt",
+                    parameters = parameter.names,n.chains = 1, 
+			  n.iter = 2000, n.burnin=1000, n.thin=1,  
+			  bugs.directory = openbugs.dir, debug=F, program="OpenBUGS")
+
+########## null ###########
+
+
+# initial values
+# should be a list with one list for each chain
+inits1<-list(  
+	        list( m=1.0, tau=1.0 ) )
+
+# defining the names of the parameters we wish to monitor
+parameter.names <- c( 's', 'tau' , 'm' )
+
+
+# defining the directory of OpenBUGS
+openbugs.dir <- "C:/Program Files (x86)/OpenBUGS"
+
+# generating random samples using OpenBUGS
+model.null<- bugs( data, inits1, model.file = "anova_null.txt",
+                    parameters = parameter.names,n.chains = 1, 
+			  n.iter = 2000, n.burnin=1000, n.thin=1,  
+			  bugs.directory = openbugs.dir, debug=F, program="OpenBUGS")
+
+
+
+###DIC - Gelman's formula
+
+#model.a
+0.5*var(model.a$sims.matrix[,"deviance"])+mean(model.a$sims.matrix[,"deviance"])
+
+#model.b
+0.5*var(model.b$sims.matrix[,"deviance"])+mean(model.b$sims.matrix[,"deviance"])
+
+#model.a.b
+0.5*var(model.a.b$sims.matrix[,"deviance"])+mean(model.a.b$sims.matrix[,"deviance"])
+
+#interaction model
+0.5*var(model.ab.intr$sims.matrix[,"deviance"])+mean(model.ab.intr$sims.matrix[,"deviance"])
+
+#null model
+0.5*var(model.null$sims.matrix[,"deviance"])+mean(model.null$sims.matrix[,"deviance"])
+
+
