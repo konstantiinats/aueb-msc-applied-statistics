@@ -3,11 +3,11 @@
 ## Summer 2020
 ## Lecturer: A. Yannakopoulos
 ## Author: Konstantina Tsami
-
+## Language: Matlab
 
 ### Implementation of the Vasicek model on short rate. The dataset used is the three-month EURIBOR from 02/07/2001 - 04/24/2006. 
 ### The aformentioned model had been used in five different cases in order to predict the EURIBOR rate return for the next 70 days.
-#### Language: Matlab
+
 
 
 
