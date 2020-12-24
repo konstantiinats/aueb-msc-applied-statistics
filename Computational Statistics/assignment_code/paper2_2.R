@@ -55,7 +55,7 @@ for (i in 1:800){
 		f.x<-inverse(F.x,lower=0)
 		xstar[j]<-f.x(u)
 		}
-	#ektimhsh gia to è1
+	#ektimhsh gia to Ã¨1
 xstar<-runif(95,0,20)
 	thet<-optim(-100,negloglikgengamma,hessian=TRUE,method="BFGS",dat=xstar)
 	thetastar[i]<-thet$par
