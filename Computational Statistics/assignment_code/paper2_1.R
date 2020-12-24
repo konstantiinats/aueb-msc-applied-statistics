@@ -22,7 +22,7 @@ y<-c(2.1,4,2.6,1.5,2.5,4,2,
 
 
 
-##a=ln(a) k=ln(k) l=ln(ë)
+##a=ln(a) k=ln(k) l=ln(Ã«)
 
 
 #minus log likelihood function
@@ -49,7 +49,7 @@ ggammamle<-cbind(est=fitggamma$par,se=sqrt(diag(solve(fitggamma$hessian))))
 ggammamle 
 
 
-#95% CI for log(a)=è1
+#95% CI for log(a)=Ã¨1
 CI<-cbind(LCI=ggammamle[1,1]-2*ggammamle[1,2],UCI=ggammamle[1,1]+2*ggammamle[1,2])
 exp(CI)
 
