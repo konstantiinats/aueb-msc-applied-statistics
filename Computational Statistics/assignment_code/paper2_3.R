@@ -3,7 +3,7 @@
 
 #fitting an exponential distribution
 #Initially, we estimate the parameter
-#still using the parameterisation è3=log(ë)
+#still using the parameterisation Ã¨3=log(Ã«)
 #lambda=log(l)
 
 ellexp <- function(lambda,dat) {
@@ -53,8 +53,8 @@ fitexp2.lazy <- optim(0.5, minusellexp.lazy, method='BFGS', dat=testdat, hessian
 
 
 #LR test
-#LR=-2[l(è1)-l(è2)]
-#LR=-2(-minusellexp(è1)-(-negloglikgengamma(è2)), where è2 a vector
+#LR=-2[l(Ã¨1)-l(Ã¨2)]
+#LR=-2(-minusellexp(Ã¨1)-(-negloglikgengamma(Ã¨2)), where Ã¨2 a vector
 
 
 
@@ -75,7 +75,7 @@ curve(dchisq(x,2),col="blue",add=T)
 ###
 
 
-#comparison of simulated (exact) and ×2,2
+#comparison of simulated (exact) and Ã—2,2
 #(asymptotic) cutoff points
 rbind(simulated=quantile(lrt,prob=c(0.8,0.9,0.95,0.99)),
 chisq=qchisq(c(0.8,0.9,0.95,0.99),2))
